@@ -1,4 +1,4 @@
-if [ "$(echo "$SSH_AUTH_SOCK" | grep 'agent')" != "" ]; then
+if [ "$(who | grep -c "$(id -un)")" -le 1 ] && [ "$(echo "$SSH_AUTH_SOCK" | grep 'agent')" != "" ]; then
   ssh-agent -k
   git config --global --unset user.name
   git config --global --unset user.email

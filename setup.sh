@@ -59,11 +59,13 @@ else
     # Inject auto-load logic for default account
     autoload_marker='# Auto-load default git account'
     if [ "$(grep -n "$autoload_marker" $profile)" = "" ]; then
-        autoload_code='# Auto-load default git account (if set)
-if [[ -f $HOME/.gitacc ]] && grep -q '"'"'\[DEFAULT\]'"'"' $HOME/.gitacc 2>/dev/null; then
-  default_acc=$(grep -A1 '"'"'\[DEFAULT\]'"'"' $HOME/.gitacc | grep '"'"'account'"'"' | cut -d'"'"'='"'"' -f2 | xargs)
-  if [[ -n "$default_acc" ]]; then
-    git-acc "$default_acc" 2>/dev/null || true
+        autoload_code='# Auto-load default git account (if set) - skip when agent already active
+if [[ "$SSH_AUTH_SOCK" != *agent* ]]; then
+  if [[ -f $HOME/.gitacc ]] && grep -q '"'"'\[DEFAULT\]'"'"' $HOME/.gitacc 2>/dev/null; then
+    default_acc=$(grep -A1 '"'"'\[DEFAULT\]'"'"' $HOME/.gitacc | grep '"'"'account'"'"' | cut -d'"'"'='"'"' -f2 | xargs)
+    if [[ -n "$default_acc" ]]; then
+      git-acc "$default_acc" 2>/dev/null || true
+    fi
   fi
 fi'
         printf "\n%s\n" "$autoload_code" >> $profile
